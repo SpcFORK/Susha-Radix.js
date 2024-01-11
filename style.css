@@ -20,7 +20,7 @@ html {
     justify-content: center;
     align-items: center;
   }
-}
+};
 
 /* Styles for SpcSearch elements */
 #search-bar.focused,
