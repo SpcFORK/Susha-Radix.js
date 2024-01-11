@@ -1,3 +1,52 @@
+async function getIcon(name = '', dir = '') {
+  if (!hasSusha()) return;
+
+  let folder = `./susha-radix/radix-icons/${name}`;
+
+  let dirUrl = new URL(dir, window.location.href);
+  let parsedUrl = new URL(folder, dirUrl);
+
+  let icon = await fetch(parsedUrl.href);
+
+  if (icon.status === 200) {
+    return await icon.blob()
+
+  } else {
+    console.log(icon.status)
+    return false;
+  }
+}
+
+async function createIcon(blob) {
+  if (!hasSusha()) return;
+
+  // Convert the blob to a base64 string
+  let base64 = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+
+  let icon = i()
+    .class$('radix-icon')
+    .att$('role', 'img')
+    .att$('aria-label', 'icon')
+    .att$('tabindex', '-1')
+    .att$('title', 'icon')
+    .att$('alt', 'icon')
+    .style$({
+      'background-image': `url(data:image/svg+xml;base64,${base64})`,
+      width: '15px',
+      height: '15px',
+      'vertical-align': '-.125em',
+      display: 'inline-block'
+    })
+
+  return icon;
+
+}
+
 window.Radix_META = class Radix_META {
   static struct = [
     "accessibility.svg",
@@ -335,36 +384,21 @@ window.Radix_META = class Radix_META {
     "zoom-out.svg"
   ]
 
-  constructor() {
-    let ss = document.createElement("style")
-
-    let ml = `
-    .si::before,
-    [class^="si-"]::before,
-    [class*=" si-"]::before 
-    {
-      width: 15px;
-      height: 15px;
-      vertical-align: -.125em;
-    }
+  constructor(loc = './') {
+    this.buffers = {}
     
-    `
+    this.loaded = new Promise(resolve => {
+      [...Radix_META.struct].map(async (name_, i) => {
+        // split at first '.'
+        const [name, ext] = name_.split('.')
 
-    
-    for (let o of Radix_META.struct) {
-      let name = o.split(/\.svg$/)[0]
+        this.buffers[name] = await getIcon(name, loc)
+        this[name] = async () => await createIcon(this.buffers[name])
+        
+        if (i === Radix_META.struct.length - 1) resolve()
+      })
+    })
 
-      ml += `
-      
-        .si-${name}:before 
-        {
-          background-image: url(https://radix-ui.com/icons/${Radix_META.struct.indexOf(o)}.svg);
-        };
-        `.trim()
-    }
-
-    return [
-      ...Radix_META.struct
-    ]
+    .then(_ => this.loaded = true)
   }
 }
