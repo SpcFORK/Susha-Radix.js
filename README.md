@@ -1,3 +1,9 @@
+# Susha-Radix
+
+This allows for Radix-Ui Icons to be parsed into Susha Tag Icons for the web. 
+
+---
+
 The provided code shows two functions, getIcon and createIcon, and a class Radix_META which are involved in fetching, loading, and creating icons in a web application.
 
 - getIcon function:
