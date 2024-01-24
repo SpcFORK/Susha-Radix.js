@@ -389,6 +389,7 @@ window.Radix_META = class Radix_META {
 
   constructor(loc = './') {
     this.buffers = {}
+    this.loaded = false;
 
     if (location.toString().includes('replit.dev')) {
       console.error('Susha Radix is not supported on Replit.dev, please deploy.')
